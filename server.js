@@ -11,8 +11,9 @@ const port = process.env.PORT || 3000;
 require('dotenv').config();
 
 app.use(cors());
+//apply middleware
+app.use(checkSession);
 
-//app.use(checkSession);
 app.get('/fetch-image/:roomID', async (req, res) => {
     var roomID = req.params.roomID;
     var url_ressult = [];
@@ -30,6 +31,7 @@ app.get('/fetch-image/:roomID', async (req, res) => {
     }
     res.json(url_ressult)
 })
+
 app.post('/chat-media/:roomID', multerMultiUpload, async (req, res) => {
     const roomID = req.params.roomID;
     var uploadResult = [];
