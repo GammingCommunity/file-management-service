@@ -8,17 +8,32 @@ module.exports= {
       }
     }
   `,
-  chatRoomMedia: (roomID,url,height,width) => `
-  mutation{
-    chatRoom(roomID:"${roomID}",messages:{
-      messageType:media
-        text:{
-        content:"${url}"
-        height:${height}
-    	width:${width}
+  chatRoomMedia: (roomID,media) => `
+    mutation{
+      chatRoom(roomID:"${roomID}",messages:{
+        messageType:media
+          text:{
+            content:"${media.url}"
+            height:${media.height}
+            width:${media.width}
+        }
+      }){
+        status 
       }
-    }){
-      status 
+    }`,
+  chatPrivateMedia: (friendID,media) =>
+  `
+    mutation{
+      chatPrivate(friendID:"${friendID}",input:{
+        messageType:media
+        text:{
+          content:"${media.url}"
+            height:${media.height}
+            width:${media.width}
+        }
+      }){
+        status
+      }
     }
-  }`
+  `
 }

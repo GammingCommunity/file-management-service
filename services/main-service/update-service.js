@@ -16,11 +16,11 @@ module.exports = {
 		}
 		return false;		
 	},
-	chatMedia: async(token,urls)=>{
+	chatMedia: async(token,friendID,roomID,type,media)=>{
 		var response = await fetch(env.mainServiceURL,{
 			method:'POST',
 			headers: { 'Content-Type': 'application/json','token':token},
-			body:JSON.stringify({query:mutation.chatRoomMedia(url)})
+			body:JSON.stringify({query:type == "room" ? mutation.chatRoomMedia(roomID,url,media) : mutation.chatPrivateMedia(friendID,media)})
 		})
 	}
 }
