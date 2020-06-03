@@ -14,8 +14,6 @@ module.exports = async (req, res, next) => {
         });
     }
     else {
-        console.log(req.headers.token);
-
         const response = await fetch(authUrl, {
             method: "GET",
             headers: {

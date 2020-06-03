@@ -16,7 +16,7 @@ app.use(cors());
 //apply middleware
 app.use(checkSession);
 
-app.get('/fetch-image/:roomID', async (req, res) => {
+app.get('/fetch-media/:roomID', async (req, res) => {
     var roomID = req.params.roomID;
     var url_ressult = [];
     var images = await cloudinary.search
@@ -31,17 +31,16 @@ app.get('/fetch-image/:roomID', async (req, res) => {
         url_ressult.push({ "url": item.secure_url, "created_at:": item.created_at })
 
     }
-    res.json(url_ressult)
+    res.json(+url_ressult)
 })
 
-app.post('/chat-media/:roomID', multerMultiUpload, async (req, res) => {
+app.post('/chat-media/:roomID/:type', multerMultiUpload, async (req, res) => {
     const roomID = req.params.roomID;
     var uploadResult = [];
     for (const item of req.files) {
         const file = dataUri(item).content;
         var result = await uploadImage(file, roomID);
         uploadResult.push(result);
-
     }
     res.json(uploadResult);
 
