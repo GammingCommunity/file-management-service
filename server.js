@@ -5,6 +5,8 @@ const { dataUri, multerMultiUpload, multerUploads } = require('./services/multer
 const uploadImage = require('./services/uploadImage');
 const uploadGroupImage = require('./services/uploadGroupImage');
 const uploadProile = require('./services/uploadProfile');
+const getAccountInfo = require('./util/getAccountInfo');
+const {updateAvatar} = require('./services/main-service/update-service');
 const cloudinary = require('cloudinary').v2;
 const app = express();
 const port = process.env.PORT || 3000;
@@ -57,14 +59,21 @@ app.post("/edit-room/:roomID/:type", multerUploads, async (req, res) => {
     res.json(result);
 })
 
-app.post('/upload-avatar', multerUploads, async (req, res, next) => {
+app.post('/change-avatar', multerUploads, async (req, res) => {
+	var accountID = getAccountInfo(res.info);
     try {
-        const file = dataUri(req).content;
-        var result = await uploadProile(file, req.body.profile_id);
-        res.json({ "code": "200", "success": true, message: "Upload success", "image_url": result })
+        const file = dataUri(req.file).content;
+		var result = await uploadProile(file, accountID);
+		updateAvatar(req.headers.token,result).then((v)=>{
+            res.status(200).json({message: "Change OK"})
+
+        }).catch((err)=>{
+            res.status(400).send(error);
+        })
 
     } catch (error) {
-        res.status(500).send(error);
+		console.log(error)
+        res.status(400).send(error);
     }
 
 })

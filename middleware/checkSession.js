@@ -3,7 +3,7 @@ const fetch = require('cross-fetch');
 module.exports = async (req, res, next) => {
     res.header("Access-Control-Allow-Origin", "YOUR-DOMAIN.TLD"); // update to match the domain you will make the request from
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    const authUrl = "https://auth-service.glitch.me/auth";
+	const authUrl = "https://auth-service.glitch.me/auth";
     //console.log(req.headers.token, process.env.secret_key_jwt);
 
 
@@ -26,7 +26,6 @@ module.exports = async (req, res, next) => {
         });
 
         //if(link.stats)
-        console.log(response);
 
         if (response.status != 200) {
             res.status(403).send({
@@ -35,6 +34,8 @@ module.exports = async (req, res, next) => {
             });
         }
         else {
+			var result = await response.json();
+			res.info = JSON.stringify(result);
             next()
         }
     }
