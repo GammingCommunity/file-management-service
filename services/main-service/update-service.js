@@ -29,5 +29,24 @@ module.exports = {
             : mutation.chatPrivateMedia(id, media),
       }),
     });
+    var v = await response.json();
+    console.log(v);
+
+
+  },
+  chatFile: async (token, id, type, media) => {
+    var response = await fetch(env.mainServiceURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", token: token },
+      body: JSON.stringify({
+        query:
+          type == "room"
+            ? mutation.chatRoomFile(id, media)
+            : mutation.chatPrivateFile(id, media),
+      }),
+    });
+    var result = await response.json();
+    console.log(result);
+    
   },
 };

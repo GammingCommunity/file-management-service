@@ -13,7 +13,8 @@ const uploadGroupImage = async (file, roomID, type) => {
         return {
             "url": resultUrl,
             "height":result.height,
-            "width":result.width,
+            "width": result.width,
+            "format":result.format
 
         };
     })
