@@ -1,20 +1,24 @@
 const { uploader } = require('cloudinary').v2;
 
-const uploadGroupImage = async (file, roomID, type) => {
-    console.log(type);
-    
+const uploadGroupImage = async (file, roomID, type,fileName) => {    
     var resultUrl = '';
     return uploader.upload(file, {
         tags: roomID,
+        use_filename: true,
+        resource_type: "auto",
+        unique_filename: false,
         folder: "group-profile/" + roomID +"/"+ type,
     }).then((result) => {
         
-        resultUrl = result.url;
+        
         return {
-            "url": resultUrl,
-            "height":result.height,
-            "width": result.width,
-            "format":result.format
+            url: result.url,
+            name: fileName,
+            size: result.bytes,
+            height: result.height,
+            width: result.width,
+            format: result.format,
+            publicID: result.public_id,
 
         };
     })

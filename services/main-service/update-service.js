@@ -3,7 +3,7 @@ const env = require("./env");
 const queries = require("./query");
 const mutation = require("./mutation");
 const getAccountID = require("../../util/getAccountInfo.js");
-
+const { uploader } = require("cloudinary").v2;
 module.exports = {
   updateAvatar: async (token, url) => {
     var response = await fetch(env.subServiceURL, {
@@ -19,6 +19,7 @@ module.exports = {
     return false;
   },
   chatMedia: async (token, id, type, media) => {
+    
     var response = await fetch(env.mainServiceURL, {
       method: "POST",
       headers: { "Content-Type": "application/json", token: token },
@@ -29,8 +30,17 @@ module.exports = {
             : mutation.chatPrivateMedia(id, media),
       }),
     });
-    var v = await response.json();
-    console.log(v);
+    var result = await response.json();
+    console.log(result);
+    
+    var status = result.data.chatPrivate.status;
+    if (status == 400) {
+      uploader.destroy(media.publicID, function (err, result) { console.log(result);
+       });
+      return false;
+    }
+
+    return true;
 
 
   },
@@ -47,6 +57,37 @@ module.exports = {
     });
     var result = await response.json();
     console.log(result);
-    
+    var status = result.data.chatPrivate.status;
+    if (status == 400) {
+      uploader.destroy(media.publicID, function (err, result) {
+        console.log(result);
+      });
+      return false;
+    }
+
+    return true;
+  },
+  updateGroup: async (token, roomID, type, media) => {
+    var response = await fetch(env.mainServiceURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", token: token },
+      body: JSON.stringify({
+        query:
+          type == "cover"
+            ? mutation.updateGroupCover(roomID, media)
+            : mutation.updateGroupProfile(roomID, media),
+      }),
+    });
+    var result = await response.json();
+    console.log(result);
+    var status = result.data.changeGroupPhoto.status;
+    if (status == 400) {
+      uploader.destroy(media.publicID, function (err, result) {
+        console.log(result);
+      });
+      return false;
+    }
+
+    return true;
   },
 };

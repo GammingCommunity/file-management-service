@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { uploader } = require('cloudinary').v2;
-const processUpload = async (file, userID) => {
+const processUpload = async (file, userID,fileName) => {
     /* =const { filename, mimetype, createReadStream } = await file;
     // var readStream = fs.createReadStream(file);
      var stream = createReadStream();*/
@@ -9,6 +9,11 @@ const processUpload = async (file, userID) => {
    
     return uploader.upload(file, {
         tags: "avatar",
+        overwrite: true,
+        use_filename: true,
+        resource_type: "auto",
+        unique_filename: false,
+        public_id: fileName,
         folder: "avatar/" + userID,
     }).then((result) => {
         resultUrl = result.url;
