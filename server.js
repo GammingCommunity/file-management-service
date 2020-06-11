@@ -85,16 +85,16 @@ app.post("/chat-media/:type/:id", multerMultiUpload, async (req, res) => {
       const sentTo = type == "room" ? id : receive_id;
 
       var media = await uploadMedia(file, id, type, fileName);
-
-      chatMedia(req.headers.token, sentTo, type, media, fileName)
+      res.status(200).json({ message: `Send media OK.`, data: media })
+      /*chatMedia(req.headers.token, sentTo, type, media, fileName)
         .then((v) => {
-          v == true ? res.status(200).json({ message: "Chat OK." })
+          v == true ? res.status(200).json({ message: "Chat OK.", data: media.url })
             : res.status(400).json({ message: "Chat unsuccessful." });;
         })
         .catch((err) => {
           console.log(err);
           res.status(400).json({ message: "Chat unsuccessful." });
-        });
+        });*/
     }
   } catch (error) {
     res.status(400).json({ message: "Chat unsuccessful." });
@@ -115,16 +115,17 @@ app.post("/chat-file/:type/:id", multerFileMultiUpload, async (req, res) => {
       const id = postType == "room" ? id : receive_id;
 
       var media = await uploadFile(file, id, postType, fileName);
-      chatFile(req.headers.token, receive_id, postType, media)
+      res.status(200).json({ message: "Send file OK.", data: media })
+     /* chatFile(req.headers.token, receive_id, postType, media)
         .then((v) => {
-          v == true ? res.status(200).json({ message: "Send file OK." })
+          v == true ? res.status(200).json({ message: "Send file OK.", data: media.url })
             : res.status(400).json({ message: "Send file not successful" });
 
         }).catch((err) => {
           console.log(err);
 
           res.status(400).json({ message: "Send file not successful" });
-        })
+        })*/
     }
   } catch (error) {
     res.status(400).json({ message: "Send file not successful" });
@@ -142,7 +143,7 @@ app.post("/edit-room/:type/:roomID", multerUploads, async (req, res) => {
   updateGroup(req.headers.token, roomID, type, media)
     .then((v) => {
       v == true
-        ? res.status(200).json({ message: `Change ${type} OK` })
+        ? res.status(200).json({ message: `Change ${type} OK`, data: media.url})
         : res.status(400).send({message:"Change fail"});
     }).catch((err) => res.status(400).send(err))
 
@@ -156,10 +157,10 @@ app.post("/change-avatar", multerUploads, async (req, res) => {
     var result = await uploadProfile(file, accountID, fileName);
     updateAvatar(req.headers.token, result)
       .then((v) => {
-        res.status(200).json({ message: "Change OK" });
+        res.status(200).json({ message: "Change OK", data: media.url });
       })
       .catch((err) => {
-        res.status(400).send(error);
+        res.status(400).send(err);
       });
   } catch (error) {
     console.log(error);
