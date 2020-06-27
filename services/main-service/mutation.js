@@ -96,6 +96,23 @@ module.exports = {
       }
     }
   `,
+
+  postUser: () =>
+    `
+      mutation{
+        createPost(postInfo:{
+          title:"I'm new here"
+          content:""
+          media:[]
+          tag:[]   
+          permission:public
+        }){
+          status
+          success
+        }
+    }
+    `,
+
   updateGroupCover: (roomID,media) => 
     `mutation{
         changeGroupPhoto(groupID:"${roomID}",type:cover,url:"${media.url}"){

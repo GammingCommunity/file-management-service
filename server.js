@@ -13,12 +13,14 @@ const uploadFile = require('./services/uploadFile');
 const uploadMedia = require("./services/uploadImage");
 const uploadGroupImage = require("./services/uploadGroupProfile");
 const uploadProfile = require("./services/uploadProfile");
+const uploadPostMedia = require('./services/uploadPostImage');
 const getAccountInfo = require("./util/getAccountInfo");
 const {
   updateAvatar,
   chatMedia,
   chatFile,
-  updateGroup
+  updateGroup,
+  userPost
 } = require("./services/main-service/update-service");
 const cloudinary = require("cloudinary").v2;
 const app = express();
@@ -116,16 +118,16 @@ app.post("/chat-file/:type/:id", multerFileMultiUpload, async (req, res) => {
 
       var media = await uploadFile(file, id, postType, fileName);
       res.status(200).json({ message: "Send file OK.", data: media })
-     /* chatFile(req.headers.token, receive_id, postType, media)
-        .then((v) => {
-          v == true ? res.status(200).json({ message: "Send file OK.", data: media.url })
-            : res.status(400).json({ message: "Send file not successful" });
-
-        }).catch((err) => {
-          console.log(err);
-
-          res.status(400).json({ message: "Send file not successful" });
-        })*/
+      /* chatFile(req.headers.token, receive_id, postType, media)
+         .then((v) => {
+           v == true ? res.status(200).json({ message: "Send file OK.", data: media.url })
+             : res.status(400).json({ message: "Send file not successful" });
+ 
+         }).catch((err) => {
+           console.log(err);
+ 
+           res.status(400).json({ message: "Send file not successful" });
+         })*/
     }
   } catch (error) {
     res.status(400).json({ message: "Send file not successful" });
@@ -143,12 +145,60 @@ app.post("/edit-room/:type/:roomID", multerUploads, async (req, res) => {
   updateGroup(req.headers.token, roomID, type, media)
     .then((v) => {
       v == true
-        ? res.status(200).json({ message: `Change ${type} OK`, data: media.url})
-        : res.status(400).send({message:"Change fail"});
+        ? res.status(200).json({ message: `Change ${type} OK`, data: media.url })
+        : res.status(400).send({ message: "Change fail" });
     }).catch((err) => res.status(400).send(err))
 
 });
+app.post('/user-post', multerMultiUpload, async (req, res) => {
+  var accountID = getAccountInfo(res.info);
+  var urls = [];
+  try {
+    for (const item of req.files) {
 
+      const fileNameWithExt = item.originalname;
+      var fileName = fileNameWithExt.substr(0, fileNameWithExt.lastIndexOf('.'));
+      console.log(fileName);
+
+      const file = dataUri(item).content;
+      //console.log(item);
+
+      var media = await uploadPostMedia(file, accountID, "user",fileName)
+      urls.push(media.url);
+
+    }
+    res.status(200).json({ message: `Upload media OK.`, data: urls })
+
+  } catch (error) {
+    res.status(400).json({ message: "Upload unsuccessful." });
+  }
+
+})
+app.post('/group-post/:groupId/', multerMultiUpload, async (req, res) => {
+  var accountID = getAccountInfo(res.info);
+  const groupID = req.params.groupId;
+  var urls = [];
+  try {
+    for (const item of req.files) {
+
+      const fileNameWithExt = item.originalname;
+      var fileName = fileNameWithExt.substr(0, fileNameWithExt.lastIndexOf('.'));
+      console.log(fileName);
+
+      const file = dataUri(item).content;
+      //console.log(item);
+
+      var media = await uploadPostMedia(file, groupID, "group", fileName)
+      urls.push(media.url);
+
+    }
+    res.status(200).json({ message: `Upload media OK.`, data: urls })
+
+  } catch (error) {
+    res.status(400).json({ message: "Upload unsuccessful." });
+  }
+
+})
 app.post("/change-avatar", multerUploads, async (req, res) => {
   var accountID = getAccountInfo(res.info);
   try {
