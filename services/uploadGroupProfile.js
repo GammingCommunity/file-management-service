@@ -1,13 +1,13 @@
 const { uploader } = require('cloudinary').v2;
 
-const uploadGroupImage = async (file, roomID, type,fileName) => {    
+const uploadGroupProfile = async (file, roomID, type,fileName) => {    
     var resultUrl = '';
     return uploader.upload(file, {
         tags: roomID,
         use_filename: true,
         resource_type: "auto",
         unique_filename: false,
-        folder: "group-profile/" + roomID +"/"+ type,
+        folder: "group-profile/" + roomID,
     }).then((result) => {
         
         
@@ -23,4 +23,4 @@ const uploadGroupImage = async (file, roomID, type,fileName) => {
         };
     })
 }
-module.exports = uploadGroupImage;
+module.exports = uploadGroupProfile;

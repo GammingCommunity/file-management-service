@@ -1,17 +1,22 @@
 const express = require("express");
 const cors = require("cors");
+var multer = require('multer')
 const checkSession = require("./middleware/checkSession");
 const {
   dataUri,
   multerMultiUpload,
   multerUploads,
+  multerUploadAvatar,
+  multerUploadCover
+
 
 } = require("./services/multer_media");
 const { dataFileUri, multerFileMultiUpload, multerFileUploads
 } = require('./services/multer_file');
 const uploadFile = require('./services/uploadFile');
 const uploadMedia = require("./services/uploadImage");
-const uploadGroupImage = require("./services/uploadGroupProfile");
+const uploadGroupProfile = require("./services/uploadGroupProfile");
+const uploadGroupCover = require("./services/uploadGroupCover");
 const uploadProfile = require("./services/uploadProfile");
 const uploadPostMedia = require('./services/uploadPostImage');
 const getAccountInfo = require("./util/getAccountInfo");
@@ -163,7 +168,7 @@ app.post('/user-post', multerMultiUpload, async (req, res) => {
       const file = dataUri(item).content;
       //console.log(item);
 
-      var media = await uploadPostMedia(file, accountID, "user",fileName)
+      var media = await uploadPostMedia(file, accountID, "user", fileName)
       urls.push(media.url);
 
     }
@@ -171,12 +176,12 @@ app.post('/user-post', multerMultiUpload, async (req, res) => {
 
   } catch (error) {
     console.log(error);
-    
+
     res.status(400).json({ message: "Upload unsuccessful." });
   }
 
 })
-app.post('/group-post/:groupId/', multerMultiUpload, async (req, res) => {
+app.post('/group-post/:groupId', multerMultiUpload, async (req, res) => {
   var accountID = getAccountInfo(res.info);
   const groupID = req.params.groupId;
   var urls = [];
@@ -219,6 +224,35 @@ app.post("/change-avatar", multerUploads, async (req, res) => {
     res.status(400).send(error);
   }
 });
+var upload = multer();
+app.post('/group-image/:groupId', upload.fields([{name:"avatar",maxCount:1},{name:"cover",maxCount:1}]), async (req, res) => {
+  var accountID = getAccountInfo(res.info);
+  const groupID = req.params.groupId;
+  console.log(req.files);
+  
+  var avatarImage = req.files.avatar[0];
+  var coverImage = req.files.cover[0];
+  
+  
+  try {
+    const file1 = dataUri(avatarImage).content;
+
+    const fileName1 = avatarImage.originalname;
+    
+    const file2 = dataUri(coverImage).content;
+    const fileName2 = coverImage.originalname;
+    var result1 = await uploadGroupProfile(file1, groupID, "", fileName1);
+    var result2 = await uploadGroupCover(file2, groupID, "", fileName2);
+
+    res.status(200).json({
+      "avatar": result1.url,
+      "cover":result2.url
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send(error);
+  }
+})
 
 app.listen(port, () => {
   console.log(`Listen at http://localhost:${port}`);
