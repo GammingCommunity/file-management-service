@@ -170,6 +170,8 @@ app.post('/user-post', multerMultiUpload, async (req, res) => {
     res.status(200).json({ message: `Upload media OK.`, data: urls })
 
   } catch (error) {
+    console.log(error);
+    
     res.status(400).json({ message: "Upload unsuccessful." });
   }
 

@@ -4,13 +4,12 @@ const uploadPostMedia = async (file, ID, type, fileName) => {
     var resultUrl = "";
     return uploader
         .upload(file, {
-            tags: type ==" user" ? "user-post" : "group-post",
-
-            use_filename: true,
+            tags: type == " user" ? "user-post" : "group-post",
+            // use_filename: true,
             resource_type: "auto",
-            unique_filename: false,
-            public_id: fileName,
-
+            //unique_filename: true,
+            phash:true,
+            overwrite: false,
             folder: type == "user"
                 ? "user-post/" + ID
                 : "group-post/" + ID
